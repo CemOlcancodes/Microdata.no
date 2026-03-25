@@ -1,0 +1,51 @@
+require no.ssb.fdb:50 as db
+
+create-dataset new1
+
+
+// Importere kommune-variabel for 2025
+
+import db/BEFOLKNING_KOMMNR_FORMELL 2024-01-01 as kom2025
+destring kom2025, force
+tabulate kom2025
+clone-variables kom2025 -> bofylke2025
+recode bofylke2025  (3201/3242 = 32 'Akershus') (3001/3012 = 31'Østfold') (3301/3338 = 33 'Buskerud') (1100/1199 = 11 'Rogaland') (1500/1599 = 15 'Møre og Romsdal') (1800/1899 = 18 'Nordland') (3400/3499 = 34 'Innlandet') (3901 3903 3905 3907 3909 3911 = 39 'Vestfold') (4001/4036  = 40 'Telemark') (4200/4299 = 42 'Agder') (4600/4699 = 46 'Vestland') (5000/5099 = 50 'Trøndelag') (5501/5546  = 55 'Troms') (5601/5636  = 56 'Finnmark')  (0301 = 03 'Oslo') (2100/2199 = 21 'Svalbard') (2200/2299 = 22 'Jan Mayen') (2300/2399 = 23 'Kontinentalsokkelen') (nonmissing = 98 ' resten av landet') (missing = 99 'missing')
+keep if bofylke2025 == 32
+tabulate kom2025
+// Krim variabler
+import db/KRIMINALITET_SIKTEDE_GRUPPELOV 2024-12-31 as kriminalitet24
+tabulate kriminalitet24
+import db/BEFOLKNING_FOEDSELS_AAR_MND as faarmnd
+generate alder = 2024 - int(faarmnd/100)
+drop if alder > 18
+drop if alder < 12
+
+tabulate kriminalitet24
+
+generate aldersgrupper = 0
+replace  aldersgrupper ='12 år' if alder == 12
+replace  aldersgrupper ='13 år' if alder==13
+replace aldersgrupper ='14 år' if alder == 14
+replace aldersgrupper ='15 år' if alder == 15
+replace aldersgrupper='16 år' if alder ==16
+replace aldersgrupper ='17 år' if alder ==17
+replace aldersgrupper = '18 år' if alder == 18
+replace aldersgrupper ='ukjent' if  sysmiss(alder)
+tabulate aldersgrupper
+tabulate kriminalitet24 aldersgrupper
+
+
+// Avgjort dato, hovedlovbrudd  Alle personer som:
+//✔️ Har fått en endelig avgjørelse i løpet av året
+//✔️ Og hvor avgjørelsen tilsier at de er ansett som skyldige
+import db/KRIMINALITET_SIKTEDE_AVGJDATO 2024-12-31 as avgjdato
+tabulate kriminalitet24 avgjdato
+// Gjerning start, hovedlovbrudd
+import db/KRIMINALITET_SIKTEDE_GJDATO1 2024-12-31 as gjerninsstart
+tabulate kriminalitet24 gjerninsstart
+//Gjerning slutt, hovedlovbrudd
+import db/KRIMINALITET_SIKTEDE_GJDATO2 2024-12-31 as gjerningslutt
+tabulate kriminalitet24 gjerningslutt
+//
+import db/KRIMINALITET_SIKTEDE_REGDATO 2024-12-31 as regdato
+tabulate kriminalitet24 regdato
