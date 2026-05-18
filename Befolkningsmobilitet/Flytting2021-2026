@@ -1,0 +1,140 @@
+require no.ssb.fdb:53 as db
+
+create-dataset new1
+
+
+// Importere kommune-variabel for 2025
+import db/BEFOLKNING_STATUSKODE 2026-01-01 as status
+keep if status == '1'
+import db/BEFOLKNING_KOMMNR_FORMELL 2026-01-01 as kom2026
+
+destring kom2026, force
+
+tabulate kom2026
+clone-variables kom2026 -> fylke2026
+
+recode fylke2026  (3201/3242 = 32 'Akershus') (3101/3124 = 31'Østfold') (3301/3338 = 33 'Buskerud') (1100/1199 = 11 'Rogaland') (1500/1599 = 15 'Møre og Romsdal') (1800/1899 = 18 'Nordland') (3400/3499 = 34 'Innlandet') (3901 3903 3905 3907 3909 3911 = 39 'Vestfold') (4001/4036  = 40 'Telemark') (4200/4299 = 42 'Agder') (4600/4699 = 46 'Vestland') (5000/5099 = 50 'Trøndelag') (5501/5546  = 55 'Troms') (5601/5636  = 56 'Finnmark')  (0301 = 03 'Oslo') (2100/2199 = 21 'Svalbard') (2200/2299 = 22 'Jan Mayen') (2300/2399 = 23 'Kontinentalsokkelen') (nonmissing = 98 ' resten av landet') (missing = 99 'missing')
+
+tabulate fylke2026
+
+
+
+
+import db/BEFOLKNING_KOMMNR_FORMELL 2021-01-01 as kom2021
+destring kom2021, force
+clone-variables kom2021 -> fylke2021
+clone-variables kom2021 -> fylkes2021
+
+
+
+
+recode fylke2021 (101/106 111 113/115 118/119 122/125 127/128 130/131 133/138 3001/3004 3011/3018 = 1 'Østfold' ) (602 604/605 612 615/626 631/633 711 3005/3007 3038/3052 = 2 'Buskerud' ) (121 211 213/217 219/221 226/231 233/239 627 628 3019/3037 3053/3054 = 3 'Akershus' ) (301 = 4 'Oslo') (402 403 412 415 417/420 423 425/430 432 434 436/439 441 501 502 511/517 519/522 528 529 532/534 536 538 540/545 701 702 704 706 709 713 714 716 719 720 722 723 728 805/807 811 814 815 817 819 821 822 826/831 833 834 901 904 906 911 912 914 919 926 928 929 935 937 938 940 941 1001/1004 1014 1017 1018 1021 1026 1027 1029 1032 1034 1037 1046 1101/1103 1106 1108 1111 1112 1114 1119/1122 1124 1127 1129 1130 1133/1135 1141 1142 1144/1146 1149 1151 1160 1201 1211 1216 1219 1221/1224 1227 1228 1231/1235 1238 1241/1247 1251/1253 1256 1259 1260 1263/1266 1401 1411/1413 1416/1422 1424 1426 1428/1433 1438/1439 1441 1443/1445 1449 1502 1504/1507 1511 1514/1517 1519 1520 1523/1526 1528 1529 1531 1532 1534 1535 1539 1543 1545/1548 1551 1554 1557 1560 1563 1566 1567 1571 1573 1576/1579 1601 1612 1613 1617 1620/1622 1624 1627 1630 1632/1636 1638 1640 1644 1648 1653 1657 1662/1665 1702 1703 1711 1714 1717/1719 1721 1724 1725 1736 1738 1739 1740 1742/1744 1748/1751 1755 1756 1804/1806 1811/1813 1815/1816 1818 1820 1822 1824/1828 1832/1841 1845 1848 1850/1854 1856 1857 1859 1860 1865/1868 1870 1871 1874 1875 1902/1903 1911 1913 1917 1919 1920 1922/1929 1931 1933 1936 1938/1943 2002/2004 2011 2012 1014/2015 2017/2025 2027/2028 2030 3401 3403 3405 3407 3411/3443 3446/3454 3801/3808 3811/3825 4201/4207 4211/4228 4601 4602 4611/4651 5001 5006 5007 5014 5020/5022 5025/5029 5031/5038 5041/5047  5049 5052/5061 5401/5406 5411/5430 5432/5444= 5 'Resten av Norge')
+tabulate fylke2021
+recode fylkes2021 (0301 = 4 'Oslo')(3001/3004 3011/3018 = 1 'Østfold')(3019/3037 3053/3054 = 2 'Akershus')(3005/3007 3038/3052 = 3 'Buskerud')( 3401 3403 3405 3407 3411/3454 = 5 'Innlandet')(3801 3802/3805 3811 = 6 'Vestfold')(3806/3808 3812/3825 = 7 'Telemark')(4201/4207 4211/4228 = 8 'Agder')(1101 1103 1106 1108 1111 1112 1114 1119/1122 1124 1127 1130 1133/1135 1144/1146 1149 1151 1160 = 9 'Rogaland')(4601/4602 4611/4651 = 10 'Vestland')(1505/1507 1511 1514/1517 1520 1525 1528 1531 1532 1535 1539 1547 1554 1557 1560 1563 1566 1573 1576/1579 = 11 'Møre og Romsdal')(1804/1875 = 12 'Nordland')(1902/1943 5401/5402 5411/5429 = 13 'Troms')(2002/2030 5403/5406 5430 5432/5444 = 14 'Finnmark')(1601/1756 5001 5006 5007 5014 5020/5029 5031/5038 5041/5049 5052/5061= 15 'Trøndelag') (nonmissing = 98 ' resten av landet') (missing = 99 'missing')
+tabulate fylkes2021
+tabulate fylkes2021 fylke2026
+create-dataset telledager
+//siste datoen er 2024
+import-event db/BOSATTEFDT_BOSTED 1991-12-31 to 2024-12-31 as norskbodd
+replace STOP@norskbodd = date(2025,12,31) if STOP@norskbodd > date(2025,12,31)
+replace START@norskbodd = date(1991,12,31) if START@norskbodd < date(1991,12,31)
+generate dager = STOP@norskbodd - START@norskbodd + 1
+collapse(sum) dager, by(PERSONID_1)
+boxplot dager
+summarize dager
+histogram dager, width(30)
+drop if sysmiss(dager)
+clone-variables dager -> tidsintervaller
+recode tidsintervaller (0= 0 'Ukjent') (1/1825 = 1 'Opp til 5 år') (1826/3650 = 2 '5-10 år') (3651/999999 = 3 'Mer enn 10 år')
+tabulate tidsintervaller
+// KEEP IF dager mindre enn feks 2 år? For Ukrainernes del?
+merge tidsintervaller into new1
+use new1
+
+tabulate kom2021
+tabulate kom2026
+// Lage flytter variabel. 
+generate flytter =0 if fylke2026 == fylkes2021 & sysmiss(fylke2026) == 0 & sysmiss(fylkes2021) == 0
+replace flytter = 1 if fylke2026 != fylkes2021 & sysmiss(fylke2026) == 0 & sysmiss(fylkes2021) == 0
+tabulate flytter, missing cellpct freq
+// sankey-diagram viser hvor folk flyttet siden 2016
+sankey fylkes2021 fylke2026 if flytter
+//Importere uføre-variabel for 2016. Jeg vil bruke uføre fra 2021 i regresjonen.
+
+tabulate fylkes2021 fylke2026 if flytter
+
+
+// Lage alder-variabel
+import db/BEFOLKNING_FOEDSELS_AAR_MND
+generate alder = 2026- int(BEFOLKNING_FOEDSELS_AAR_MND/100)
+// Bruke nominaldata og lage etniske-variabler
+import db/BEFOLKNING_INVKAT as invkat
+generate nordmann = 0
+replace nordmann = 1 if invkat == 'A'
+generate innvandrere = 0
+replace innvandrere = 1 if invkat == 'B'
+tabulate fylke2021 fylke2026 if flytter
+import db/BEFOLKNING_INNGRUNN1 as innvgrunn
+
+tabulate fylke2026
+tabulate kom2026
+tabulate fylke2021 kom2026
+//keep if fylke2020 == 3
+
+tabulate kom2021 kom2026
+
+import db/INNTEKT_HUSH_IES_EU 2023-12-31 as inntektfor
+generate husinntek = 0
+replace husinntek ="1)under 200.000 kr" if inntektfor < 200000
+replace husinntek = "2)200.000 til 399999" if inntektfor  >= 200000 &  inntektfor  < 400000
+replace husinntek = "3)400.000 til 59999" if inntektfor  >= 400000 &  inntektfor < 600000
+replace husinntek = "4)600.000 til 899999" if inntektfor  >= 600000 &  inntektfor  < 900000
+replace husinntek = "5)over 900000" if inntektfor  >= 900000
+replace husinntek = 'Ukjent' if sysmiss(inntektfor)
+
+generate inntekt = 0
+replace  inntekt =1 if inntektfor < 200000
+replace  inntekt = 2 if inntektfor  >= 200000 &  inntektfor  < 400000
+replace  inntekt = 3 if inntektfor  >= 400000 &  inntektfor < 600000
+replace  inntekt = 4 if inntektfor  >= 600000 &  inntektfor  < 900000
+replace  inntekt = 5 if inntektfor  >= 900000
+replace inntekt = 'Ukjent' if sysmiss(inntektfor)
+
+tabulate kom2021 kom2026 if inntekt == '2'
+tabulate kom2021 kom2026 if inntekt == '3'
+tabulate kom2021 kom2026 if inntekt == '4'
+tabulate kom2021 kom2026 if inntekt == '5'
+
+import db/ARBSTATUS_AKT_LOHELTID 2021-11-16 as lønnstakerheltid
+tabulate kom2021 kom2026 if lønnstakerheltid
+tabulate kom2026
+create-dataset kursdata
+import-event db/NUDB_KURS_NUS 2020-01-01 to 2024-09-01 as kurstype23
+destring kurstype23, force
+tabulate kurstype23
+create-dataset lenke_kurs_person
+import db/NUDB_KURS_FNR as fnr
+merge fnr into kursdata
+use kursdata
+collapse(count) kurstype23, by(fnr)
+rename kurstype23 ant_kurs
+merge ant_kurs into new1
+use new1
+tabulate ant_kurs
+generate studerer = 0
+replace studerer = 1 if ant_kurs >= 1
+tabulate studerer
+tabulate fylkes2021 fylke2026   if  studerer
+tabulate fylkes2021 fylke2026
+keep if fylke2026 == 32
+import db/UFOERP2011FDT_MOTTAK 2024-12-01 as uføre
+
+generate Alderkategori = 2026- int(BEFOLKNING_FOEDSELS_AAR_MND/100)
+generate uf_dummy = 0
+replace uf_dummy = 1 if uføre == "1"
+
+import db/SOSHJLPFDT_MOTTAK 2024-12-01 as sosialhjelp
+generate shjelp = 0
+replace shjelp = 1 if sosialhjelp =="1"
+logit flytter  c.inntektfor c.Alderkategori i.uf_dummy i.lønnstakerheltid i.studerer i.innvgrunn i.shjelp, mfx(dydx)
+tabulate flytter
