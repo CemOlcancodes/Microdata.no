@@ -1,0 +1,47 @@
+require no.ssb.fdb:53 as db
+
+create-dataset new1
+
+
+// Importere kommune-variabel for 2025
+import db/BEFOLKNING_STATUSKODE 2026-01-01 as status
+keep if status == '1'
+import db/BEFOLKNING_KOMMNR_FORMELL 2026-01-01 as kom2026
+
+destring kom2026, force
+
+tabulate kom2026
+clone-variables kom2026 -> fylke2026
+clone-variables kom2026 -> fylkes2026
+
+
+recode fylke2026  (3201/3242 = 32 'Akershus') (3101/3124 3301/3338 1100/1199 1500/1599 1800/1899 3400/3499 3901 3903 3905 3907 3909 39114001/4036 4200/4299 4600/4699 5000/5099 5501/5546 5601/5636 0301 2100/2199 2200/2299 2300/2399 = 3 'Resten av Norge') (nonmissing = 98 ' resten av landet') (missing = 99 'missing')
+
+recode fylkes2026  (3201/3242 = 32 'Akershus') (3101/3124 = 31'Østfold') (3301/3338 = 33 'Buskerud') (1100/1199 = 11 'Rogaland') (1500/1599 = 15 'Møre og Romsdal') (1800/1899 = 18 'Nordland') (3400/3499 = 34 'Innlandet') (3901 3903 3905 3907 3909 3911 = 39 'Vestfold') (4001/4036  = 40 'Telemark') (4200/4299 = 42 'Agder') (4600/4699 = 46 'Vestland') (5000/5099 = 50 'Trøndelag') (5501/5546  = 55 'Troms') (5601/5636  = 56 'Finnmark')  (0301 = 03 'Oslo') (2100/2199 = 21 'Svalbard') (2200/2299 = 22 'Jan Mayen') (2300/2399 = 23 'Kontinentalsokkelen') (nonmissing = 98 ' resten av landet') (missing = 99 'missing')
+tabulate fylke2026
+
+
+
+
+import db/BEFOLKNING_KOMMNR_FORMELL 2021-01-01 as kom2021
+destring kom2021, force
+clone-variables kom2021 -> fylke2021
+clone-variables kom2021 -> fylkes2021
+
+
+
+
+recode fylke2021 (3019/3037 3053/3054 = 1 'Akershus') \
+  (0301 1101 1103 1106 1108 1111 1112 1114 1119/1122 1124 1127 1130 1133/1135 1144/1146 1149 1151 1160 1505 1511 1514/1517 1520 1525 1528 1531/1532 1535 1539 1547 1554 1557 1560 1563 1566 1573 1576/1579 1601/1756 1804 1806 1811/1813 1815/1816 1818 1820 1822 1824/1825 1827/1828 1832/1841 1845 1848 1851 1853 1856/1857 1859/1860 1865/1868 1870/1871 1874/1875 1902/1943 2002/2030 3001/3007 3011/3018 3038/3052 3401 3403 3405 3407 3411/3443 3446/3454 3801/3808 3811/3825 4201/4207 4211/4228 4601/4602 4611/4651 5001 5006/5007 5014 5020/5022 5025/5029 5031/5038 5041/5047 5049 5052/5061 5401/5402 5411/5430 5432/5444 = 3 'Resten av Norge') (nonmissing = 98 'Resten av landet') (missing = 99 'Missing')
+tabulate fylke2021
+recode fylkes2021 (0301 = 4 'Oslo')(3001/3004 3011/3018 = 1 'Østfold')(3019/3037 3053/3054 = 2 'Akershus')(3005/3007 3038/3052 = 3 'Buskerud')( 3401 3403 3405 3407 3411/3454 = 5 'Innlandet')(3801 3802/3805 3811 = 6 'Vestfold')(3806/3808 3812/3825 = 7 'Telemark')(4201/4207 4211/4228 = 8 'Agder')(1101 1103 1106 1108 1111 1112 1114 1119/1122 1124 1127 1130 1133/1135 1144/1146 1149 1151 1160 = 9 'Rogaland')(4601/4602 4611/4651 = 10 'Vestland')(1505/1507 1511 1514/1517 1520 1525 1528 1531 1532 1535 1539 1547 1554 1557 1560 1563 1566 1573 1576/1579 = 11 'Møre og Romsdal')(1804/1875 = 12 'Nordland')(1902/1943 5401/5402 5411/5429 = 13 'Troms')(2002/2030 5403/5406 5430 5432/5444 = 14 'Finnmark')(1601/1756 5001 5006 5007 5014 5020/5029 5031/5038 5041/5049 5052/5061= 15 'Trøndelag') (nonmissing = 98 ' resten av landet') (missing = 99 'missing')
+tabulate fylkes2021
+tabulate fylkes2021 fylke2026
+//sosialhjelp
+import db/SOSHJLPFDT_MOTTAK 2024-12-01 as sosialhjelp
+//keep if fylke2025 == 32
+tabulate sosialhjelp
+drop if fylke2021 == 99
+tabulate fylke2021 fylke2026 if sosialhjelp
+tabulate fylkes2021 fylkes2026 if sosialhjelp
+tabulate fylkes2026 if sosialhjelp 
