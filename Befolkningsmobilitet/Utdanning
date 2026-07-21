@@ -1,0 +1,93 @@
+require no.ssb.fdb:54 as db
+
+create-dataset new1
+
+
+// Importere kommune-variabel for 2025
+import db/BEFOLKNING_STATUSKODE 2026-01-01 as status
+keep if status == '1'
+  // Lage alder-variabel
+import db/BEFOLKNING_FOEDSELS_AAR_MND
+generate Alder = 2026- int(BEFOLKNING_FOEDSELS_AAR_MND/100)
+drop if Alder <= 25
+import db/BEFOLKNING_KOMMNR_FORMELL 2026-01-01 as kom2026
+
+destring kom2026, force
+
+tabulate kom2026
+clone-variables kom2026 -> fylke2026
+clone-variables kom2026 -> fylkes2026
+
+
+recode fylke2026  (3201/3242 = 32 'Akershus') (3101/3124 3301/3338 1100/1199 1500/1599 1800/1899 3400/3499 3901 3903 3905 3907 3909 3911 4001/4036 4200/4299 4600/4699 5000/5099 5501/5546 5601/5636 0301 2100/2199 2200/2299 2300/2399 = 3 'Resten av Norge') (nonmissing = 98 ' resten av landet') (missing = 99 'missing')
+
+
+tabulate fylke2026
+
+recode fylkes2026  (3201/3203 = 321 'Asker og Bærum') (3207 3212 3214 3216 3218 3220 = 322 'Follo') (3205 3222 3224 3226 3228 3230 3232 3234 3236 = 323 'Lillestrøm') (3209 3238 3240 3242 = 324 'Ullensaker/Eidsvoll') (3101/3124 = 31'Østfold') (3301/3338 = 33 'Buskerud') (1100/1199 = 11 'Rogaland') (1500/1599 = 15 'Møre og Romsdal') (1800/1899 = 18 'Nordland') (3400/3499 = 34 'Innlandet') (3901 3903 3905 3907 3909 3911 = 39 'Vestfold') (4001/4036  = 40 'Telemark') (4200/4299 = 42 'Agder') (4600/4699 = 46 'Vestland') (5000/5099 = 50 'Trøndelag') (5501/5546  = 55 'Troms') (5601/5636  = 56 'Finnmark')  (0301 = 03 'Oslo') (2100/2199 = 21 'Svalbard') (2200/2299 = 22 'Jan Mayen') (2300/2399 = 23 'Kontinentalsokkelen') (nonmissing = 98 ' resten av landet') (missing = 99 'missing')
+tabulate fylke2026
+
+
+import db/BEFOLKNING_KOMMNR_FORMELL 2021-01-01 as kom2021
+destring kom2021, force
+clone-variables kom2021 -> fylke2021
+clone-variables kom2021 -> fylkes2021
+
+
+
+
+recode fylke2021 (3019/3037 3053/3054 = 1 'Akershus') (0301 1101 1103 1106 1108 1111 1112 1114 1119/1122 1124 1127 1130 1133/1135 1144/1146 1149 1151 1160 1505/1507 1511 1514/1517 1520 1525 1528 1531/1532 1535 1539 1547 1554 1557 1560 1563 1566 1573 1576/1579 1601/1756 1804 1806 1811/1813 1815/1816 1818 1820 1822 1824/1828 1832/1841 1845 1848 1851 1853 1856/1857 1859/1860 1865/1868 1870/1871 1874/1875 1902/1943 2002/2030 3001/3007 3011/3018 3038/3052 3401 3403 3405 3407 3411/3443 3446/3454 3801/3808 3811/3825 4201/4207 4211/4228 4601/4602 4611/4651 5001 5006/5007 5014 5020/5022 5025/5029 5031/5038 5041/5047 5049 5052/5061 5401/5406 5411/5430 5432/5444  = 3 'Resten av Norge') (nonmissing = 98 'Resten av landet') (missing = 99 'Missing')
+tabulate fylke2021
+recode fylkes2021 (0301 = 4 'Oslo')(3001/3004 3011/3018 = 1 'Østfold')(3019/3037 3053/3054 = 2 'Akershus')(3005/3007 3038/3052 = 3 'Buskerud')( 3401 3403 3405 3407 3411/3454 = 5 'Innlandet')(3801 3802/3805 3811 = 6 'Vestfold')(3806/3808 3812/3825 = 7 'Telemark')(4201/4207 4211/4228 = 8 'Agder')(1101 1103 1106 1108 1111 1112 1114 1119/1122 1124 1127 1130 1133/1135 1144/1146 1149 1151 1160 = 9 'Rogaland')(4601/4602 4611/4651 = 10 'Vestland')(1505/1507 1511 1514/1517 1520 1525 1528 1531 1532 1535 1539 1547 1554 1557 1560 1563 1566 1573 1576/1579 = 11 'Møre og Romsdal')(1804/1875 = 12 'Nordland')(1902/1943 5401/5402 5411/5429 = 13 'Troms')(2002/2030 5403/5406 5430 5432/5444 = 14 'Finnmark')(1601/1756 5001 5006 5007 5014 5020/5029 5031/5038 5041/5049 5052/5061= 15 'Trøndelag') (nonmissing = 98 ' resten av landet') (missing = 99 'missing')
+//keep if fylkes2021 == 2
+
+
+
+  
+  
+  
+  
+  import db/BEFOLKNING_BYDEL 2021-01-01 as bydel21
+tabulate bydel21
+destring bydel21, force
+
+keep if fylkes2021 == 4
+tabulate fylkes2021
+keep if fylke2026 == 32
+tabulate fylke2026
+//recode bydel20 (030105 030106 030107 030108 030104 030116 = 1 'Oslo vest')  (030101 030102 030103 030109 030110 030111 030112 030113 030114 030115 = 2 'Oslo øst')
+recode bydel21 (030105 030106 030107 030108 030104 030116 = 1 'Oslo vest')  (030101 030102 030103 030109 030110 030111 030112 030113  = 2 'Oslo øst') (030114 030115 = 3 'Nordstrand område')
+tabulate bydel21
+tabulate bydel21 fylkes2026
+
+drop if bydel21 == 30117
+drop if bydel21 == 30199
+
+//legger til utdanningsnivå
+import db/NUDB_BU 2024-08-01 as utd
+generate utd1 = substr(utd,1,1)
+//lager kategorier
+generate utdniv = '9'
+replace utdniv = '0' if utd1 == '0'
+replace utdniv = '1' if utd1 == '1' | utd1 == '2'
+replace utdniv = '2' if utd1 == '3' | utd1 == '4' | utd1 == '5'
+replace utdniv = '3' if utd1 == '6'
+replace utdniv = '4' if utd1 == '7' | utd1 == '8'
+define-labels utdnivtxt '0' 'Ingen utdanning' '1' 'Grunnskolenivå' '2'  'Videregående grunnopplæring' '3' 'Universitets og høgskolenivå kort' '4' 'Universitets og høgskolenivå lang' '9' 'Uoppgitt el ingen utdanning'
+assign-labels utdniv utdnivtxt
+
+destring utdniv, force
+tabulate bydel21 kom2026 if utdniv == 1
+tabulate bydel21 kom2026 if utdniv == 2
+tabulate bydel21 kom2026 if utdniv == 3
+tabulate bydel21 kom2026 if utdniv == 4 
+
+tabulate bydel21 fylkes2026 if utdniv == 1
+tabulate bydel21 fylkes2026 if utdniv == 2
+tabulate bydel21 fylkes2026 if utdniv == 3
+tabulate bydel21 fylkes2026 if utdniv == 4
+
+tabulate fylkes2021 kom2026 if utdniv == 1
+tabulate fylkes2021 kom2026 if utdniv == 2
+tabulate  fylkes2021 kom2026 if utdniv == 3
+tabulate  fylkes2021 kom2026 if utdniv == 4 
