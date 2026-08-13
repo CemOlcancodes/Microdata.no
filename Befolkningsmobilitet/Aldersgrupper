@@ -4,7 +4,7 @@ create-dataset new1
 
 
 // Importere kommune-variabel for 2025
-import db/BEFOLKNING_STATUSKODE 2026-01-01 as status
+import db/BEFOLKNING_STATUSKODE 2020-01-01 as status
 keep if status == '1'
 import db/BEFOLKNING_KOMMNR_FORMELL 2026-01-01 as kom2026
 
