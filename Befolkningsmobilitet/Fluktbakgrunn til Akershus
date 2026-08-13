@@ -1,0 +1,42 @@
+require no.ssb.fdb:55 as db
+
+create-dataset new1
+
+
+// Importere kommune-variabel for 2025
+import db/BEFOLKNING_STATUSKODE 2020-01-01 as status
+keep if status == '1'
+import db/BEFOLKNING_KOMMNR_FORMELL 2020-01-01 as kom2020
+destring kom2020, force
+clone-variables kom2020 -> fylkes2020
+
+recode fylkes2020 (0301 = 4 'Oslo')(3001/3004 3011/3018 = 1 'Østfold')(3019/3037 3053/3054 = 2 'Akershus')(3005/3007 3038/3052 = 3 'Buskerud')( 3401 3403 3405 3407 3411/3454 = 5 'Innlandet')(3801 3802/3805 3811 = 6 'Vestfold')(3806/3808 3812/3825 = 7 'Telemark')(4201/4207 4211/4228 = 8 'Agder')(1101 1103 1106 1108 1111 1112 1114 1119/1122 1124 1127 1130 1133/1135 1144/1146 1149 1151 1160 = 9 'Rogaland')(4601/4602 4611/4651 = 10 'Vestland')(1505/1507 1511 1514/1517 1520 1525 1528 1531 1532 1535 1539 1547 1554 1557 1560 1563 1566 1573 1576/1579 = 11 'Møre og Romsdal')(1804/1875 = 12 'Nordland')(1902/1943 5401/5402 5411/5429 = 13 'Troms')(2002/2030 5403/5406 5430 5432/5444 = 14 'Finnmark')(1601/1756 5001 5006 5007 5014 5020/5029 5031/5038 5041/5049 5052/5061= 15 'Trøndelag') (nonmissing = 98 ' resten av landet') (missing = 99 'missing')
+import db/BEFOLKNING_KOMMNR_FORMELL 2025-01-01 as kom2025
+
+destring kom2025, force
+
+tabulate kom2025
+clone-variables kom2025 -> fylke2025
+
+recode fylke2025  (3201/3242 = 32 'Akershus') (3101/3124 = 31'Østfold') (3301/3338 = 33 'Buskerud') (1100/1199 = 11 'Rogaland') (1500/1599 = 15 'Møre og Romsdal') (1800/1899 = 18 'Nordland') (3400/3499 = 34 'Innlandet') (3901 3903 3905 3907 3909 3911 = 39 'Vestfold') (4001/4036  = 40 'Telemark') (4200/4299 = 42 'Agder') (4600/4699 = 46 'Vestland') (5000/5099 = 50 'Trøndelag') (5501/5546  = 55 'Troms') (5601/5636  = 56 'Finnmark')  (0301 = 03 'Oslo') (2100/2199 = 21 'Svalbard') (2200/2299 = 22 'Jan Mayen') (2300/2399 = 23 'Kontinentalsokkelen') (nonmissing = 98 ' resten av landet') (missing = 99 'missing')
+import db/SOSHJLPFDT_MOTTAK 2024-12-01 as sosialhjelp
+tabulate sosialhjelp 
+tabulate fylkes2020 fylke2025 if sosialhjelp == '1'
+tabulate sosialhjelp if fylke2025 == 32
+tabulate fylke2025
+drop if fylke2025 == 32
+keep if fylkes2020 == 2
+tabulate fylkes2020 fylke2025 if sosialhjelp == '1'
+//import db/BEFOLKNING_INNGRUNN1 as invgrunn
+//tabulate invgrunn
+//keep if invgrunn == "FLU"
+//tabulate fylkes2020 fylke2025 if sosialhjelp == '1'
+import db/BEFOLKNING_INVKAT as invkategori
+keep if sosialhjelp == '1'
+tabulate invkategori
+
+tabulate fylkes2020 fylke2025 if invkategori == "A"
+tabulate fylkes2020 fylke2025 if invkategori == "B"
+tabulate fylkes2020 fylke2025 if invkategori == "C"
+tabulate fylkes2020 fylke2025 if invkategori == "D"
+tabulate fylkes2020 fylke2025 if invkategori == "C"
